@@ -1,0 +1,29 @@
+extends ../layouts/default
+
+block main
+    h1= title
+
+block content
+    - if (cars.length)
+        - each car in cars
+            .car
+                h3
+                    a(href='/cars/'+car._id, title=car.title) #{car.title}
+                    p= car.body
+
+                    .meta
+                        span.muted= formatDate(car.createdAt)
+
+                        - if (car.user)
+                            | &nbsp; - &nbsp;
+                            span Author &nbsp;
+
+                            -var name = car.user.name ? car.user.name : car.user.username
+
+                            a(href="/users/"+car.user._id)= name
+        - if (pages >1)
+            ul.pagination
+                != createPagination(pages, page)
+    - else
+        h4.muted No cars.&nbsp;
+            a(href="/cars/new") create one

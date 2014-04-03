@@ -1,0 +1,8 @@
+node_modules/
+.monitor
+config/config.js
+config/imager.js
+Makefile
+.DS_Store
+public/img/upload
+public/img/thumbnail

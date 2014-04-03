@@ -1,0 +1,33 @@
+extends ../layouts/default
+
+block main
+    h1= title
+    hr
+
+block content
+    .row
+        .col-md-8
+            form.form-horizontal(method='post', action='/users', enctype='multipart/form-data', role='form')
+                input(type='hidden', name='_csrf', value='#{csrf_token}')
+
+                - if (!user.isNew)
+                    input(type='hidden', name='_method', value='PUT')
+
+                .form-group
+                    label.col-sm-2.control-label(for='name') Title
+                    .col-sm-10
+                        input.form-control#name(type='text', name='name', value=user.name, placeholder='Enter name')
+
+                .form-group
+                    label.col-sm-2.control-label(for='username') Username
+                    .col-sm-10
+                        input.form-control#username(type='text', name='username', value=user.username, placeholder='Enter Username')
+                .form-group
+                    label.col-sm-2.control-label(for='email') Email
+                    .col-sm-10
+                        input.form-control#email(type='text', name='email', value=user.email, placeholder='enter email')
+
+                .form-group
+                    .col-sm-offset-2.col-sm-10
+                        button.btn.btn-primary(type='submit') Save
+                        a.btn(href='/users/'+user._id, title='cancel') Cancel

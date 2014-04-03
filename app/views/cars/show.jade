@@ -1,0 +1,42 @@
+extends ../layouts/default
+
+block main
+    h1= car.title
+
+block content
+    .row
+        .col-md-8
+            p= '汽车描述：'+ car.desc
+            .meta
+                - if (car.user)
+                    - var name = car.user.name ? car.user.name : car.user.username
+                    p 拥有者 :&nbsp;
+                        a(href="/users/"+car.user._id)= name
+
+                p.muted= formatDate(car.createdAt, "%b %d, %Y at %I:%M %p")
+        .col-md-4
+            - if (!car.inNew && car.image)
+                img(src=car.image.url)
+    - if (car.rentee.user)
+        p 正在被&nbsp;
+            a(href='/users/'+car.rentee.user._id)= car.rentee.user.name
+            &nbsp;
+            使用
+
+    - if (req.user && req.car)
+        - var s1 = req.user._id.toString();
+        - var s2 = req.car.user._id.toString();
+        - if (s1 == s2)
+            form(action="/cars/"+car.id, method="post", onsubmit="return confirm('Are you sure?')")
+                input(type='hidden', name='_csrf', value='#{csrf_token}')
+                a.btn.btn-default(href='/cars/'+car._id+'/edit', title='edit') Edit
+                input(type='hidden', name='_method', value='DELETE')
+                button.btn.btn-danger(type='submit') Delete
+        - else
+            a.btn.btn-warning(href='/cars/'+car.id+'/rent') 预定
+
+    br
+    h3 Comments
+    - each comment in car.comments
+        include ../carcomments/comment
+    include ../carcomments/form

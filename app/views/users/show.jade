@@ -1,0 +1,24 @@
+extends ../layouts/default
+
+block main
+  - var name = user.name ? user.name : user.username
+  h1= name
+
+block content
+    .col-md-2
+        ul.nav.nav-pills.nav-stacked
+            li(class='')
+                a(href='/cars/new', title='new car') 添加新车
+            li
+                a(href='/users/'+user._id+'/edit', title='edit profile') 更新账户信息
+            li
+                a(href='/users/'+user._id+'/password', title'change password') 更改密码
+
+    .col-md-8
+        .row
+            正在租的车
+        .row
+            - each renting in user.rentings
+                p= '汽车标题：'+renting.car.title
+                p
+                    a(href='/users/'+renting.car.user)= '拥有者 '+renting.car.user
