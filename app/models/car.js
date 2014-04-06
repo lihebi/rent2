@@ -4,61 +4,45 @@ var mongoose = require('mongoose')
     , fs = require('fs')
     , easyimage = require('easyimage')
 
-var CarSchema = new Schema({
+var BicycleSchema = new Schema({
     title: { type: String, default: '', trim: true},
     brand: { type: String, default: '', trim: true},
-    user: { type: Schema.ObjectId, ref: 'User'},
+    owner: {type: Schema.ObjectId, ref: 'User'},
     desc: { type: String, default: '', trim: true},
     comments: [{
         body: { type: String, default: ''},
         user: { type: Schema.ObjectId, ref: 'User'},
         createdAt: { type: Date, default: Date.now}
     }],
-    rentee: {
+    customers: {
         user: { type: Schema.ObjectId, ref: 'User'},
         createdAt: { type: Date, default: Date.now}
     },
     image: {
         url: String
     },
+    available: [{
+        type: 
     createdAt: { type: Date, default: Date.now}
 });
 
-CarSchema.path('title').required(true, 'Car title cannot be blank');
-CarSchema.path('desc').required(true, 'just say something about it.');
+BicycleSchema.path('title').required(true, 'Bicycle title cannot be blank');
+BicycleSchema.path('desc').required(true, 'just say something about it.');
 
-CarSchema.methods = {
+BicycleSchema.methods = {
     moveAndSave: function (files, cb) {
+        var url;
         image = files.image;
         if (!image) return this.save(cb);
-        var tmpPath = image.path;
-        var index = image.path.lastIndexOf('/');
-        var filename = image.path.substr(index);
-        var targetPath = 'public/img/upload'+filename;
-        var thumbnailPath = 'public/img/thumbnail'+filename;
-        var url = '/img/thumbnail'+filename;
-        fs.rename(tmpPath, targetPath, function(err){
-            if (err) return this.save(cb);
-            fs.unlink(tmpPath, function() {
-                if (err) throw err; //TODO really ?
+        utils.moveImage(image, 'public/img/upload/', function(newPath) {
+            utils.thumbnailImage(newPath, 'public/img/thumbnail/', function(thumbnailPath){
+                var self = this;
+                this.validate(function(err){
+                    if (err) return cb(err);
+                    self.image = { url: thumbnailPath};
+                    self.save(cb);
+                });
             });
-        });
-        easyimage.thumbnail({
-            src: targetPath,
-            dst: thumbnailPath,
-            height: 128,
-            width: 128,
-            x: 0,
-            y: 0
-        }, function(err, image) {
-            if (err) throw err;
-        });
-        //var imager = new Imager(imagerConfig, 'S3')
-        var self = this;
-        this.validate(function(err){
-            if (err) return cb(err);
-            self.image = { url: url};
-            self.save(cb);
         });
     },
     saveOnly: function(cb) {
@@ -83,8 +67,8 @@ CarSchema.methods = {
         else return cb('not found');
         this.save(cb);
     },
-    addRentee: function(user, cb) {
-        this.rentee = {
+    setCustomer: function(user, cb) {
+        this.user = {
             user: user._id
         };
         this.save(cb);
@@ -95,7 +79,7 @@ CarSchema.methods = {
     }
 };
 
-CarSchema.statics = {
+BicycleSchema.statics = {
     load: function(id, cb) {
         this.findOne({_id: id})
             .populate('user', 'name email username')
@@ -115,4 +99,4 @@ CarSchema.statics = {
     }
 };
 
-mongoose.model('Car', CarSchema);
+mongoose.model('Bicycle', BicycleSchema);

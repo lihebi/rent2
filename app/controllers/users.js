@@ -88,6 +88,7 @@ exports.create = function (req, res) {
 
 exports.show = function (req, res) {
   var user = req.profile;
+  var cars = [];
   for (var i=0;i<user.rentings.length;i++) {
       var car = user.rentings[i].car;
       User.findOne({_id: car.user}).exec(function(err, user) {
@@ -107,7 +108,7 @@ exports.show = function (req, res) {
  * Find user by id
  */
 
-exports.user = function (req, res, next, id) {
+exports.load = function (req, res, next, id) {
     User.load(id, function(err, user) {
         if (err) return next(err);
         if (!user) return next(new Error('failed to load user'));

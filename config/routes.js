@@ -43,7 +43,7 @@ module.exports = function (app, passport) {
     app.get('/users/:userId/edit', userAuth, users.edit);
     app.get('/users/:userId/password', userAuth, users.password);
     app.post('/users/password', auth.requiresLogin, users.changePassword);
-  app.param('userId', users.user)
+  app.param('userId', users.load)
       /*
   app.get('/auth/google',
     passport.authenticate('google', {
@@ -60,14 +60,14 @@ module.exports = function (app, passport) {
 */
 
   // article routes
-  app.param('id', articles.load)
+  app.param('articleId', articles.load)
   app.get('/articles', articles.index)
   app.get('/articles/new', auth.requiresLogin, articles.new)
   app.post('/articles', auth.requiresLogin, articles.create)
-  app.get('/articles/:id', articles.show)
-  app.get('/articles/:id/edit', articleAuth, articles.edit)
-  app.put('/articles/:id', articleAuth, articles.update)
-  app.del('/articles/:id', articleAuth, articles.destroy)
+  app.get('/articles/:articleId', articles.show)
+  app.get('/articles/:articleId/edit', articleAuth, articles.edit)
+  app.put('/articles/:articleId', articleAuth, articles.update)
+  app.del('/articles/:articleId', articleAuth, articles.destroy)
 
   // home route
   //app.get('/', articles.index)
@@ -76,9 +76,9 @@ module.exports = function (app, passport) {
   // comment routes
   var comments = require('../app/controllers/comments')
   app.param('commentId', comments.load)
-  app.post('/articles/:id/comments', auth.requiresLogin, comments.create)
-  app.get('/articles/:id/comments', auth.requiresLogin, comments.create)
-  app.del('/articles/:id/comments/:commentId', commentAuth, comments.destroy)
+  app.post('/articles/:articleId/comments', auth.requiresLogin, comments.create)
+  app.get('/articles/:articleId/comments', auth.requiresLogin, comments.create)
+  app.del('/articles/:articleId/comments/:commentId', commentAuth, comments.destroy)
 
   // tag routes
   var tags = require('../app/controllers/tags')
